@@ -1,0 +1,136 @@
+# .github/workflows/tests.yml
+# Pipeline CI/CD — NexusGame Test Suite
+#
+# TODO — Ce fichier est un squelette à compléter.
+# Votre pipeline doit exécuter les tests dans le bon ordre.
+# Documentez dans le README :
+#   - Pourquoi cet ordre d'exécution ?
+#   - Qu'avez-vous choisi de mettre dans la CI vs de laisser en local ?
+#   - Pourquoi ce choix ?
+
+name: NexusGame CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  # ── Job 1 : Tests unitaires ────────────────────────────────────────────────
+  unit-tests:
+    name: Tests unitaires
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: |
+          pip install flask pytest pytest-html pytest-cov
+
+      - name: Lancer les tests unitaires
+        run: |
+          # TODO — Compléter la commande pytest
+          # Indice : pytest tests/test_unit.py -v --cov=app_gamestore --cov-report=html:reports/coverage --html=reports/unit.html
+          echo "TODO : compléter cette étape"
+
+      - name: Uploader les rapports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-reports
+          path: |
+            # TODO — reports/coverage/
+            # TODO — reports/unit.html
+
+  # ── Job 2 : Tests d'intégration ───────────────────────────────────────────
+  integration-tests:
+    name: Tests d'intégration
+    runs-on: ubuntu-latest
+    needs: unit-tests   # Ne tourne que si les tests unitaires passent
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: |
+          pip install flask pytest pytest-html requests
+
+      - name: Lancer les tests d'intégration
+        run: |
+          # TODO — Compléter
+          echo "TODO : compléter cette étape"
+
+  # ── Job 3 : Tests Newman ───────────────────────────────────────────────────
+  api-tests:
+    name: Tests API Newman
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Installer Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Démarrer l'API GameStore
+        run: |
+          pip install flask
+          # TODO — Démarrer l'API et attendre qu'elle soit prête
+          # Indice : python app_gamestore.py & puis vérifier avec curl
+          echo "TODO : démarrer l'API"
+
+      - name: Lancer Newman
+        run: |
+          # TODO — Lancer la collection Newman
+          # Indice : newman run tests/gamestore_collection.json ...
+          echo "TODO : compléter cette étape"
+
+  # ── Job 4 : Tests UI Playwright ────────────────────────────────────────────
+  ui-tests:
+    name: Tests UI Playwright
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: |
+          pip install flask pytest pytest-playwright playwright
+          playwright install chromium
+
+      - name: Démarrer l'API GameStore
+        run: |
+          # TODO — Démarrer l'API et attendre qu'elle soit prête
+          # Indice : python app_gamestore.py & puis vérifier avec curl
+          echo "TODO : démarrer l'API"
+
+      - name: Lancer les tests UI
+        run: |
+          # TODO — Compléter
+          echo "TODO : compléter cette étape"
+
+      # TODO — Uploader les screenshots d'échec comme artefacts
