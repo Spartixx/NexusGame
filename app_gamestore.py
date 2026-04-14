@@ -18,9 +18,11 @@ app.config['JSON_SORT_KEYS'] = False
 
 def get_db():
     """Connexion SQLite partagée dans le contexte de la requête."""
+    if not os.path.exists(DATABASE):
+        init_db()
+
     if 'db' not in g:
-        db_path = current_app.config.get('DATABASE', DATABASE)
-        g.db = sqlite3.connect(db_path)
+        g.db = sqlite3.connect(DATABASE)
         g.db.row_factory = sqlite3.Row
         g.db.execute('PRAGMA foreign_keys = ON')
     return g.db
@@ -258,7 +260,7 @@ def delete_game(game_id):
         return jsonify({'error': f'Jeu {game_id} introuvable'}), 404
     db.execute('DELETE FROM games WHERE id = ?', (game_id,))
     db.commit()
-    return jsonify({'deleted': True, 'id': game_id}), 200
+    return jsonify({'deleted': True, 'id': game_id}), 204
 
 
 # ── Endpoints de statistiques et recherche ──────────────────────────────────
