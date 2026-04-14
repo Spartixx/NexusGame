@@ -164,7 +164,7 @@ def list_games():
 def create_game():
     """Crée un nouveau jeu. Body JSON requis avec title, genre, price."""
     data = request.get_json(silent=True)
-    if not data:
+    if not data or type(data) is not dict:
         return jsonify({'error': 'Body JSON requis'}), 400
 
     errors = validate_game(data)

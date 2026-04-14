@@ -8,11 +8,15 @@ Lancement :
     pytest tests/test_integration.py -v -m integration
     pytest tests/test_integration.py -v --html=reports/integration.html
 """
+import subprocess
+from datetime import datetime
 import pytest
 import requests
 import time
 import sys
 import os
+
+from flask import request_started
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -32,6 +36,9 @@ def api_url():
     # À compléter
     # Note : tant que la fixture n'est pas implémentée,
     # l'API doit tourner manuellement avant de lancer ces tests.
+    proc = subprocess.Popen(["python", "app_gamestore.py"])
+    time.sleep(3)
+    proc.terminate()
     yield "http://localhost:5000"
 
 
@@ -51,8 +58,9 @@ class TestScenariosCatalogueComplet:
         TODO — GET /games retourne 200 et une liste non vide.
         Utiliser requests.get(), pas client.get().
         """
-        # À compléter
-        pass
+        response = requests.get(f"{api_url}/games")
+        assert response.status_code == 200
+        assert len(response.json()) > 0
 
     def test_cycle_complet_creation_lecture_suppression(self, api_url):
         """
@@ -63,16 +71,26 @@ class TestScenariosCatalogueComplet:
         4. GET /games/{id} → vérifier 404
 
         """
-        # À compléter
-        pass
+        post_response = requests.post(f"{api_url}/games", json={"title": f"title-{datetime.now().timestamp()}", "price": 10, "rating": 5, "stock": 10, "genre": "RPG"})
+        game_id = post_response.json().get("id")
+        print(post_response.json())
+        assert post_response.status_code == 201
+        assert requests.get(f"{api_url}/games/{game_id}").status_code == 200
+        assert requests.delete(f"{api_url}/games/{game_id}").status_code == 204
+        assert requests.get(f"{api_url}/games/{game_id}").status_code == 404
 
     def test_mise_a_jour_stock(self, api_url):
         """
         TODO — Créer un jeu avec stock=10, PUT pour passer à stock=0,
         vérifier que la valeur est bien persistée en base.
         """
-        # À compléter
-        pass
+        game_id = requests.post(f"{api_url}/games", json={"title": f"title-{datetime.now().timestamp()}", "price": 10, "rating": 5, "stock": 10, "genre": "RPG"}).json().get("id")
+        requests.put(f"{api_url}/games/{game_id}", json={"stock": 0})
+
+        response = requests.get(f"{api_url}/games/{game_id}")
+        assert response.status_code == 200
+        assert response.json().get("stock") == 0
+        assert requests.delete(f"{api_url}/games/{game_id}").status_code == 204
 
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -97,16 +115,23 @@ class TestRobustesse:
             threads = [threading.Thread(target=call) for _ in range(10)]
             ...
         """
-        # À compléter
-        pass
+        import threading
+        results = []
+
+        def call(): results.append(requests.get(f"{api_url}/games").status_code)
+
+        threads = [threading.Thread(target=call) for _ in range(10)]
+
+        for res in results:
+            assert res == 200
 
     def test_payload_json_malforme(self, api_url):
         """
         TODO — POST /games avec un body non-JSON (texte brut).
         L'API doit retourner 400 sans crasher.
         """
-        # À compléter
-        pass
+        response = requests.post(f"{api_url}/games", json="test")
+        assert response.status_code == 400
 
 
 # ════════════════════════════════════════════════════════════════════════════════

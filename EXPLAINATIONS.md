@@ -40,6 +40,7 @@ Mettre les variables sort et order comme ceci rend le code sensible aux injectio
 ## /games/featured
 
 - AJout des tests unitaires
+- Intégration sur Locust
 - COrrectif : Ne renvoie que les jeu dont le prix et le stock sont supérieurs à 0. Cela a été détecté suite à des tests unitaires pour récupérer uniquement les jeux gratuit ou avec un stock positif.
 
 ## Locust
@@ -94,3 +95,14 @@ Ajouter un header : "Cross-Origin-Opener-Policy" et "Cross-Origin-Resource-Polic
 
 ### Solution pour "Server Leaks Version Information via "Server" HTTP Response Header Field" ( 2 instances )
 Supprimer le header : "Server", cela donne des informations notamment sur la version du serveur Web, et les attaques possibles.
+
+
+## Tests d'intégrations
+- J'ai corrigé ceci relevé suite à un test qui donnait une 500 au lieu d'une 400 ( celui où on met du texte brut au lieu de json )
+```py
+data = request.get_json(silent=True)
+if not data or type(data) is not dict: # Ajout du or type(data) is not dict
+    return jsonify({'error': 'Body JSON requis'}), 400
+```
+
+Je fais dans le CI un lancement de l'API gamestore car ma fixture marche pas
