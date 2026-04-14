@@ -46,3 +46,43 @@ jobs:
           path: |
             reports/coverage/
             reports/unit.html
+  # ── Job 3 : Tests Newman ───────────────────────────────────────────────────
+  api-tests:
+    name: Tests API Newman
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Installer Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Démarrer l'API GameStore
+        run: |
+          pip install flask
+          python app_gamestore.py & sleep 2
+          curl --fail http://localhost:5000/health
+
+      - name: Lancer Newman
+        run: |
+          mkdir -p reports
+          newman run "tests/nexus_game.json" \
+            --env-var "base_url=http://localhost:5000" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export reports/newman.html
+
+      - name: Uploader le rapport Newman
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: |
+            reports/newman.html
