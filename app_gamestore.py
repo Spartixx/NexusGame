@@ -936,8 +936,6 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 def index():
     return render_template_string(HTML_TEMPLATE)
 
-
-
 # ── Endpoint featured ────────────────────────────────────────────────────────
 @app.route('/games/featured')
 def featured_games():

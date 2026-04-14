@@ -6,3 +6,5 @@ htmlcov/
 gamestore.db
 reports/
 screenshots/
+rapport_zap.html
+zap.yaml
