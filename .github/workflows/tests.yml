@@ -86,3 +86,42 @@ jobs:
           name: newman-report
           path: |
             reports/newman.html
+  # ── Job 4 : Tests UI Playwright ────────────────────────────────────────────
+  ui-tests:
+    name: Tests UI Playwright
+    runs-on: ubuntu-latest
+    needs: [ unit-tests ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: |
+          pip install flask playwright pytest-playwright pytest-html
+          playwright install chromium --with-deps
+
+      - name: Démarrer l'API GameStore
+        run: |
+          pip install flask
+          python app_gamestore.py & sleep 2
+          curl --fail http://localhost:5000/health
+
+      - name: Lancer les tests UI
+        run: |
+          mkdir -p reports screenshots
+          pytest tests/test_ui.py -v \
+            --html=reports/playwright_report.html \
+            --self-contained-html
+
+      - name: Uploader screenshots et rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-reports
+          path: |
+            reports/playwright_report.html
+            screenshots/

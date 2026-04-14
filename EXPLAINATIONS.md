@@ -62,3 +62,12 @@ Je note aussi que les routes testé avec un poid plus important ( donc plus de r
 - Je rajoute aussi un test sur le temps de réponse ( < 500 ms sur la liste des jeux ) : Encore une fois, car feature primordiale
 - CI : J'ai ajouté l'upload d'artefacts ( le report newman.html ) qui fournit le rapport de tests.
 
+## PlayWright
+- Les tests m'ont permit de corriger un bug de syntaxe sur le front : 
+```js
+showToast(data.error || 'Erreur lors de l\'ajout', true);
+```
+Même avec le backslash, le format était mauvais et une erreur de syntaxe était levée, j'y ai donc ajouté des guillemets doubles : 
+```js
+showToast(data.error || "Erreur lors de l\'ajout", true);
+```
