@@ -36,3 +36,9 @@ rows = db.execute(
 ).fetchall() 
 ```
 Mettre les variables sort et order comme ceci rend le code sensible aux injections SQL puisque les variables sort et order sont récupéré deppuis l'URL, et sont définies par l'utilisateurs lors de la requête.
+
+
+## /games/featured
+
+- AJout des tests unitaires
+- COrrectif : Ne renvoie que les jeu dont le prix et le stock sont supérieurs à 0.

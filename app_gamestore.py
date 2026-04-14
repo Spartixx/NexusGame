@@ -961,7 +961,7 @@ def featured_games():
     except (ValueError, TypeError):
         limit = 5
 
-    rows  = db.execute('SELECT * FROM games ORDER BY rating ASC').fetchall()
+    rows  = db.execute('SELECT * FROM games WHERE stock > 0 AND price > 0 ORDER BY rating ASC').fetchall()
     games = [dict(r) for r in rows]
     featured = games[:limit]
 
