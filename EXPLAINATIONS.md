@@ -1,0 +1,38 @@
+# Documentation de mises en place des tests.
+
+## Tests unitaires : 
+
+### Correctif : 
+- Dans le get_db() de app_gamestore.py ajout du code ci dessous pour initialiser la DB si elle n'existe pas, et correctif de fonction : 
+```py
+if not os.path.exists(DATABASE):
+    init_db()
+```
+- Lors d'un test pour la suppression, j'ai constaté que le retour de l'endpoint en delete était en 200, je l'ai remit en 204.
+
+### Tests
+- Ajout de la librairie python typing pour typer proprement mes méthodes et fonctions.
+- Ajouts de la fixture client pour utiliser un client Flask pour les requête HTTP sur l'API. Ajout d'un teardown pour cette fixture qui supprime toutes les parties afin que les tests soit indépendants les uns des autres. Supprimer l'entièreté de la base de jeu, puisque par principe, les tests doivent être isolé, et cette suppression ne doit avoir aucune conséquence sur le travail en parrallèle de l'équipe. ( Faire tourner les tests sous containers ( Test Containers ), cela permet l'isolation total et un environnement proche de la production. Pareil dans le CI, les tests tournent dans des environnement isolés. Car ici aucun container n'est mit en place pour l'exécution de tests ).
+
+- Ajout d'une fixture qui renvoie le body nécessaire à la création d'un jeu, pour gagner en temps.
+
+- D'abord, je met en place une méthode protégée interne dans une classe `TestingService` dont héritera les autres classes de test. Elle test le status ok, souvent demandé et renvoie le body de réponse. Cela permet plus de clareté : `_test_status_ok(client, url)`, et en lisibilité.
+- Je rajoute une autre méthode protégée interne dans la classe `TestingService` qui permet de vérifier l'existence d'une clé et optionnelement sa valeur dans un dictionnaire. Encore une fois, cela apporte clareté, lisibilité.
+- J'ajoute encore une méthode protégée interne qui permet l'ajout d'un jeu.
+
+### Nouveaux tests :
+**Stats :**
+Cet endpoint n'était pas du tout testé. J'ai également retiré la classe `TestChoixLibres` par `TestGameStats` pour un nom plus explicite. 
+
+### Notes : 
+- J'ai remarqué ceci dans app_gamestore.py : 
+```py
+rows = db.execute( 
+
+    f'SELECT * FROM games WHERE genre = ? ORDER BY {sort} {order}', 
+
+    (genre,) 
+
+).fetchall() 
+```
+Mettre les variables sort et order comme ceci rend le code sensible aux injections SQL puisque les variables sort et order sont récupéré deppuis l'URL, et sont définies par l'utilisateurs lors de la requête.
