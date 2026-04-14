@@ -40,7 +40,7 @@ Mettre les variables sort et order comme ceci rend le code sensible aux injectio
 ## /games/featured
 
 - AJout des tests unitaires
-- COrrectif : Ne renvoie que les jeu dont le prix et le stock sont supérieurs à 0.
+- COrrectif : Ne renvoie que les jeu dont le prix et le stock sont supérieurs à 0. Cela a été détecté suite à des tests unitaires pour récupérer uniquement les jeux gratuit ou avec un stock positif.
 
 ## Locust
 
@@ -53,3 +53,12 @@ J'en conclu donc que l'API a une capacité maximum de 1150 utiisateurs simultann
 La route /games/featured précédemment corrigée a donc les mêmes statistiques que les autres routes avec un poid de 1.
 
 Je note aussi que les routes testé avec un poid plus important ( donc plus de requêtes ) on un P95 plus élevé. Partant du principe que ces endpoints sont les plus touchés, un cache comme Redis pourrait être intéressant à intégrer afn de limiter le nombre d'appel à la base de données et réduire le temps de chargement et ainsi augmenter le seuil de saturation pour cet endpoint.
+
+## Postman
+
+### Ajouts :
+- Je décide de rajouter le fait de filtrer par un genre qui existe et qui n'existe pas. Il faut s'assurer que si tel est le cas, l'API ne crash pas. Un filtre sur une liste est beaucoup utilisé, la preuve en est que l'endpoint avec un filtre sur la liste avait un poid de 3 sur les tests locust.
+- Ensuite puisque la liste est l'élément le plus utilisé encore, je test le tri par ordre croissant et décroissant.
+- Je rajoute aussi un test sur le temps de réponse ( < 500 ms sur la liste des jeux ) : Encore une fois, car feature primordiale
+- CI : J'ai ajouté l'upload d'artefacts ( le report newman.html ) qui fournit le rapport de tests.
+
