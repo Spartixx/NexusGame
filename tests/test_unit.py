@@ -258,7 +258,7 @@ class TestGameStats(TestingService):
 # SECTION 6 — Endpoint /games/featured (NGS-108)
 # ════════════════════════════════════════════════════════════════════════════════
 
-class TestFeatured:
+class TestFeatured(TestingService):
     """
     Tests sur l'endpoint GET /games/featured.
     Consultez la documentation de l'endpoint dans app_gamestore.py.
@@ -267,29 +267,53 @@ class TestFeatured:
     """
 
     def test_featured_retourne_200(self, client):
-        """TODO — GET /games/featured retourne 200."""
-        pass
+        """GET /games/featured retourne 200."""
+        self._test_status_ok(client, "/games/featured")
 
     def test_featured_retourne_liste(self, client):
-        """TODO — La réponse contient une clé 'featured' qui est une liste."""
-        pass
+        """La réponse contient une clé 'featured' qui est une liste."""
+        response_json = client.get("/games/featured").json
+        assert "featured"in response_json
+        assert type(response_json.get("featured")) is list
 
     def test_featured_max_5_par_defaut(self, client):
-        """TODO — Sans paramètre, au maximum 5 jeux sont retournés."""
-        pass
+        """Sans paramètre, au maximum 5 jeux sont retournés."""
+        for i in range(6):
+            self._add_game(client, f"title-{i}")
+
+        response_json = client.get('/games/featured').json
+
+        assert len(response_json['featured']) <= 5
 
     def test_featured_limit_param(self, client):
-        """TODO — ?limit=3 retourne au maximum 3 jeux."""
-        pass
+        """?limit=3 retourne au maximum 3 jeux."""
+        for i in range(5):
+            self._add_game(client, f"title-{i}")
+
+        response_json = client.get('/games/featured?limit=3').json
+
+        assert len(response_json['featured']) <= 3
 
     def test_featured_tries_par_rating_decroissant(self, client):
-        """TODO — Les jeux sont triés par rating décroissant."""
-        pass
+        """Les jeux sont triés par rating décroissant."""
+        for i in range(2):
+            self._add_game(client, title=f"title-{i}", rating=i, price=20, stock=10)
+
+        games = self._test_status_ok(client, "/games/featured").get("featured")
+
+        assert len(games) > 1
+        old_rating = games[0]
+
+        for game in games[1:]:
+            assert game["rating"] > old_rating["rating"]
+            old_rating = game
 
     def test_featured_sans_jeux_gratuits(self, client):
-        """TODO — Les jeux gratuits ne doivent pas apparaître dans featured."""
-        pass
+        """Les jeux gratuits ne doivent pas apparaître dans featured."""
+        self._add_game(client, price=0)
+        assert len(client.get('/games/featured').json.get("featured")) == 0
 
     def test_featured_sans_jeux_hors_stock(self, client):
-        """TODO — Les jeux hors stock ne doivent pas apparaître dans featured."""
-        pass
+        """Les jeux hors stock ne doivent pas apparaître dans featured."""
+        self._add_game(client, stock=0)
+        assert len(client.get('/games/featured').json.get("featured")) == 0
