@@ -18,33 +18,28 @@ class HomePage:
         # TODO — Définir les locators pour chaque élément interactif.
         # Utiliser les data-testid définis dans l'API GameStore.
         #
-        # self.game_list  = page.locator("...")
-        # self.game_count = page.locator("...")
-        # self.add_btn    = page.locator("...")
-        # self.search_inp = page.locator("...")
-        # self.genre_sel  = page.locator("...")
+        self.game_list = page.locator('[data-testid=game-list]')
+        self.game_count = page.locator('[data-testid=game-count]')
+        self.add_btn = page.locator('[data-testid=add-game-btn]')
+        self.search_inp = page.locator('[data-testid=search-input]')
+        self.genre_sel = page.locator('[data-testid=genre-filter]')
 
     def navigate(self):
         """Naviguer vers la page d'accueil."""
-        # TODO
-        pass
+        self.page.goto(BASE_URL)
 
     def get_game_cards(self):
         """Retourner le locator de toutes les cartes de jeux."""
-        # TODO
-        pass
+        return self.game_list.locator('[data-testid=game-card]')
 
     def open_add_form(self):
         """Cliquer sur le bouton Ajouter un jeu."""
-        # TODO
-        pass
+        self.add_btn.click()
 
     def search(self, query: str):
         """Taper une requête dans la barre de recherche."""
-        # TODO
-        pass
+        self.search_inp.fill(query)
 
     def filter_genre(self, genre: str):
         """Sélectionner un genre dans le filtre déroulant."""
-        # TODO
-        pass
+        self.genre_sel.select_option(genre)

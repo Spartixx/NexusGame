@@ -11,14 +11,12 @@ class AddGameModal:
     def __init__(self, page: Page):
         self.page = page
 
-        # TODO — Définir les locators du formulaire.
-        #
-        # self.modal      = page.locator("...")
-        # self.input_title  = page.locator("...")
-        # self.input_genre  = page.locator("...")
-        # self.input_price  = page.locator("...")
-        # self.submit_btn   = page.locator("...")
-        # self.cancel_btn   = page.locator("...")
+        self.modal = page.locator("[data-testid=add-game-modal]")
+        self.input_title = page.locator("[data-testid=input-title]")
+        self.input_genre = page.locator("[data-testid=input-genre]")
+        self.input_price = page.locator("[data-testid=input-price]")
+        self.submit_btn = page.locator("[data-testid=submit-btn]")
+        self.cancel_btn = page.locator("[data-testid=cancel-btn]")
 
     def fill_and_submit(self, title: str, genre: str, price: float):
         """
@@ -28,12 +26,14 @@ class AddGameModal:
         3. Remplir input_price avec str(price)
         4. Cliquer sur submit_btn
         """
-        pass
+        self.input_title.fill(title)
+        self.input_genre.fill(genre)
+        self.input_price.fill(str(price))
+        self.submit_btn.click()
+
 
     def cancel(self):
-        """TODO — Cliquer sur le bouton Annuler."""
-        pass
+        self.cancel_btn.click()
 
     def is_visible(self) -> bool:
-        """TODO — Retourner True si le modal est visible."""
-        pass
+        return self.modal.is_visible()
