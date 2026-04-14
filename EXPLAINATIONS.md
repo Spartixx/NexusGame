@@ -71,3 +71,26 @@ Même avec le backslash, le format était mauvais et une erreur de syntaxe étai
 ```js
 showToast(data.error || "Erreur lors de l\'ajout", true);
 ```
+
+## Scan de sécurité : 
+
+### Vulnérabilités trouvées : 
+- `Medium` : 2
+- `Low` : 6
+- `Informational` : 2
+
+
+### Solution pour "X-Content-Type-Options Header Missing" ( 2 instances )
+Ajouter un header : "X-Content-Type-Options" avec comme valeur : "nosniff"
+
+### Solution pour " Permissions Policy Header Not Set" ( 2 instances en low + 4 en medium )
+Ajouter un header : "Content-Security-Policy".
+
+### Solution pour "Cross-Origin-Embedder-Policy Header Missing or Invalid" ( 2 instances )
+Ajouter un header : "Cross-Origin-Embedder-Policy header" avec valeur "require-corp"
+
+### Solution pour "Cross-Origin-Opener-Policy Header Missing or Invalid" et "Cross-Origin-Resource-Policy Header Missing or Invalid" ( 4 instances chacuns )
+Ajouter un header : "Cross-Origin-Opener-Policy" et "Cross-Origin-Resource-Policy" avec valeur "same-origin"
+
+### Solution pour "Server Leaks Version Information via "Server" HTTP Response Header Field" ( 2 instances )
+Supprimer le header : "Server", cela donne des informations notamment sur la version du serveur Web, et les attaques possibles.
