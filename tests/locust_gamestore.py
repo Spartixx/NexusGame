@@ -58,6 +58,9 @@ class GameStoreUser(HttpUser):
         ) as response:
             if response.status_code not in (200, 404):
                 response.failure(f"Status inattendu : {response.status_code}")
+            else:
+                response.success()
+
 
     @task(2)
     def health_check(self):
@@ -84,7 +87,11 @@ class GameStoreUser(HttpUser):
         Utilisez response.failure() si quelque chose ne correspond pas
         à ce que la documentation de l'endpoint promet.
         """
-        # À compléter
+        with self.client.get("/games/featured", catch_response=True) as response:
+            if response.status_code != 200:
+                response.failure(f"Code d'echec : {response.status_code}")
+            else:
+                response.success()
         self.client.get("/games/featured", name="/games/featured")
 
     @task(1)

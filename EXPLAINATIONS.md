@@ -37,8 +37,19 @@ rows = db.execute(
 ```
 Mettre les variables sort et order comme ceci rend le code sensible aux injections SQL puisque les variables sort et order sont récupéré deppuis l'URL, et sont définies par l'utilisateurs lors de la requête.
 
-
 ## /games/featured
 
 - AJout des tests unitaires
 - COrrectif : Ne renvoie que les jeu dont le prix et le stock sont supérieurs à 0.
+
+## Locust
+
+### Observations : 
+J'ai lancé les tests locust, avec un objectif de 10 000 utilisateurs sur l'application, avec une montée de 40 utilisateurs par secondes.
+Je m'apperçois qu'à partir de 1150 utilisateurs, le P95 ( donc 95% des requêtes ) est à 3 100 ms. A partir de ce seuil, le temps de réponse ne fait qu'augmenter.
+J'ai maintenu ce test de charge pendant quelques minutes et les temps de réponses se sont prolongés jusqu'à 135 000 ms pour 8 400 utilisateurs.
+J'en conclu donc que l'API a une capacité maximum de 1150 utiisateurs simultannés avant de saturer.
+
+La route /games/featured précédemment corrigée a donc les mêmes statistiques que les autres routes avec un poid de 1.
+
+Je note aussi que les routes testé avec un poid plus important ( donc plus de requêtes ) on un P95 plus élevé. Partant du principe que ces endpoints sont les plus touchés, un cache comme Redis pourrait être intéressant à intégrer afn de limiter le nombre d'appel à la base de données et réduire le temps de chargement et ainsi augmenter le seuil de saturation pour cet endpoint.
